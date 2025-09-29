@@ -1,5 +1,6 @@
-from fastapi import FastAPI
+import os
 import pandas as pd
+from fastapi import FastAPI
 
 app = FastAPI()
 
@@ -9,10 +10,16 @@ def root():
 
 @app.get("/mis")
 def mis_analytics():
-    df = pd.read_csv("students_mis.csv")  # Make sure the CSV is included
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    csv_path = os.path.join(base_dir, "students_mis.csv")
+
+    df = pd.read_csv(csv_path)
 
     result = {
         "Total": int(len(df)),
-        "ByDepartment": df["Department"].value_counts().to_dict()
+        "BySemester": df["Semester"].value_counts().to_dict(),
+        "ByCourse": df["Course"].value_counts().to_dict(),
+        "EmploymentRate": float(df["EmployedWithin6Months"].mean()),
+        "AverageGPA": float(df["GPA"].mean())
     }
     return result
