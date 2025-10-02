@@ -1,6 +1,6 @@
-import os
+from fastapi import FastAPI, UploadFile, File
 import pandas as pd
-from fastapi import FastAPI
+import os
 
 app = FastAPI()
 
@@ -8,6 +8,7 @@ app = FastAPI()
 def root():
     return {"message": "Python Analytics Server is running"}
 
+# --- Old MIS endpoint ---
 @app.get("/mis")
 def mis_analytics():
     base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -23,3 +24,20 @@ def mis_analytics():
         "AverageGPA": float(df["GPA"].mean())
     }
     return result
+
+# --- New SPI endpoint ---
+@app.post("/analyze_csv/")
+async def analyze_csv(file: UploadFile = File(...)):
+    df = pd.read_csv(file.file)
+
+    avg_score = df['Score'].mean()
+    max_score = df['Score'].max()
+    min_score = df['Score'].min()
+    fail_rate = (df['Score'] < 50).mean() * 100
+
+    return {
+        "average": round(avg_score, 2),
+        "highest": int(max_score),
+        "lowest": int(min_score),
+        "failure_rate": round(fail_rate, 2)
+    }
