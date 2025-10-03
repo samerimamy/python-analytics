@@ -1,6 +1,6 @@
-from fastapi import FastAPI, UploadFile, File, HTTPException
+import os
 import pandas as pd
-from io import StringIO
+from fastapi import FastAPI, HTTPException
 
 app = FastAPI()
 
@@ -8,21 +8,20 @@ app = FastAPI()
 def root():
     return {"message": "Python Analytics Server is running"}
 
-# 🔹 must be POST, not GET
-@app.post("/analyze_csv")
-async def analyze_csv(file: UploadFile = File(...), pass_mark: float = 60.0):
-    try:
-        content = (await file.read()).decode("utf-8", errors="ignore")
-        df = pd.read_csv(StringIO(content))
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Bad CSV: {e}")
+# 🔹 Directly read a fixed CSV file from the repo
+@app.get("/analyze_csv")
+def analyze_csv():
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    csv_path = os.path.join(base_dir, "analyze_csv.csv")  # put file in repo root
 
-    if "Score" not in df.columns:
-        raise HTTPException(status_code=400, detail="CSV must contain a 'Score' column")
+    if not os.path.exists(csv_path):
+        raise HTTPException(status_code=404, detail="CSV file not found on server")
+
+    df = pd.read_csv(csv_path)
 
     return {
         "average": round(float(df["Score"].mean()), 2),
         "highest": round(float(df["Score"].max()), 2),
         "lowest": round(float(df["Score"].min()), 2),
-        "failure_rate": round(float((df["Score"] < pass_mark).mean() * 100.0), 2)
+        "failure_rate": round(float((df["Score"] < 60).mean() * 100.0), 2)
     }
