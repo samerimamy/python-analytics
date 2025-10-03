@@ -8,7 +8,7 @@ app = FastAPI()
 def root():
     return {"message": "SPI Python API is running"}
 
-@app.post("/analyze_csv/")
+@app.post("/analyze_csv")
 async def analyze_csv(file: UploadFile = File(...)):
     try:
         # Read file safely into memory
