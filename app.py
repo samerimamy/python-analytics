@@ -1,6 +1,4 @@
-from fastapi import FastAPI, UploadFile, File, HTTPException
-import pandas as pd
-from io import StringIO
+from fastapi import FastAPI, UploadFile, File
 
 app = FastAPI()
 
@@ -8,26 +6,12 @@ app = FastAPI()
 def root():
     return {"message": "Python Analytics Server is running"}
 
-# Change GET → POST and accept a file
+# 🔹 Just receive the CSV and return its name and size
 @app.post("/analyze_csv")
-async def analyze_csv(file: UploadFile = File(...), pass_mark: float = 60.0):
-    try:
-        content = (await file.read()).decode("utf-8", errors="ignore")
-        df = pd.read_csv(StringIO(content))
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Bad CSV: {e}")
-
-    if "Score" not in df.columns:
-        raise HTTPException(status_code=400, detail="CSV must contain a 'Score' column")
-
-    avg = float(df["Score"].mean())
-    hi = float(df["Score"].max())
-    lo = float(df["Score"].min())
-    fail_rate = float((df["Score"] < pass_mark).mean() * 100.0)
-
+async def analyze_csv(file: UploadFile = File(...)):
+    content = await file.read()   # read all bytes
     return {
-        "average": round(avg, 2),
-        "highest": round(hi, 2),
-        "lowest": round(lo, 2),
-        "failure_rate": round(fail_rate, 2)
+        "filename": file.filename,
+        "size_bytes": len(content),
+        "content_start": content[:100].decode("utf-8", errors="ignore")  # preview first 100 chars
     }
