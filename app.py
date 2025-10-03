@@ -1,31 +1,6 @@
-import os
-import pandas as pd
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import UploadFile, File, HTTPException
 from io import StringIO
 
-app = FastAPI()
-
-@app.get("/")
-def root():
-    return {"message": "Python Analytics Server is running"}
-
-@app.get("/mis")
-def mis_analytics():
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    csv_path = os.path.join(base_dir, "students_mis.csv")
-
-    df = pd.read_csv(csv_path)
-
-    result = {
-        "Total": int(len(df)),
-        "BySemester": df["Semester"].value_counts().to_dict(),
-        "ByCourse": df["Course"].value_counts().to_dict(),
-        "EmploymentRate": float(df["EmployedWithin6Months"].mean()),
-        "AverageGPA": float(df["GPA"].mean())
-    }
-    return result
-
-# 🔹 New endpoint for uploads
 @app.post("/analyze_csv")
 async def analyze_csv(file: UploadFile = File(...), pass_mark: float = 60.0):
     try:
