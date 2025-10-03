@@ -1,5 +1,5 @@
-import pandas as pd
 from fastapi import FastAPI, UploadFile, File, HTTPException
+import pandas as pd
 from io import StringIO
 
 app = FastAPI()
@@ -8,11 +8,10 @@ app = FastAPI()
 def root():
     return {"message": "Python Analytics Server is running"}
 
-# 🔹 New endpoint: Blazor can POST CSV here
+# Change GET → POST and accept a file
 @app.post("/analyze_csv")
 async def analyze_csv(file: UploadFile = File(...), pass_mark: float = 60.0):
     try:
-        # Read uploaded file
         content = (await file.read()).decode("utf-8", errors="ignore")
         df = pd.read_csv(StringIO(content))
     except Exception as e:
