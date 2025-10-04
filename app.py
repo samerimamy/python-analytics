@@ -11,15 +11,26 @@ def root():
 @app.get("/mis")
 def mis_analytics():
     base_dir = os.path.dirname(os.path.abspath(__file__))
-    csv_path = os.path.join(base_dir, "test.csv")
+    csv_path = os.path.join(base_dir, "students_mis.csv")
 
     df = pd.read_csv(csv_path)
 
     result = {
         "Total": int(len(df)),
-        "StudentID": df["StudentID"].value_counts().to_dict(),
-        "Score": df["SCore"].value_counts().to_dict()
-        #"employmentrate": float(df["employedwithin6months"].mean()),
-        #"averagegpa": float(df["gpa"].mean())
+        "BySemester": df["Semester"].value_counts().to_dict(),
+        "ByCourse": df["Course"].value_counts().to_dict(),
+        "EmploymentRate": float(df["EmployedWithin6Months"].mean()),
+        "AverageGPA": float(df["GPA"].mean())
+    }
+    return result
+@app.get("/analyze_csv")
+def analyze_csv_analytics():
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    csv_path = os.path.join(base_dir, "students_mis.csv")
+
+    df = pd.read_csv(csv_path)
+
+    result = {
+        print(df.to_dict(orient="records"))
     }
     return result
