@@ -1,35 +1,22 @@
-from fastapi import FastAPI, Query
-import pandas as pd
+from fastapi import FastAPI
 import os
 
 app = FastAPI()
-
-# Directory where Blazor saves uploaded files
-UPLOAD_DIR = "wwwroot/uploads"
 
 @app.get("/")
 def root():
     return {"message": "Python Analytics Server is running"}
 
-@app.get("/analyze_csv")
-def analyze_csv(filename: str = Query(...)):
-    filepath = os.path.join(UPLOAD_DIR, filename)
-
-    if not os.path.exists(filepath):
-        return {"error": f"File not found: {filepath}"}
+@app.get("/show_file")
+def show_file(filename: str = "test.py"):
+    if not os.path.exists(filename):
+        return {"error": f"File not found: {filename}"}
 
     try:
-        df = pd.read_csv("test.csv")
+        with open(filename, "r", encoding="utf-8") as f:
+            content = f.read()
     except Exception as e:
-        return {"error": f"Failed to read CSV: {str(e)}"}
+        return {"error": str(e)}
 
-    result = {
-        "rows": len(df),
-        "columns": list(df.columns),
-        "average": df['Score'].mean() if 'Score' in df else None,
-        "highest": df['Score'].max() if 'Score' in df else None,
-        "lowest": df['Score'].min() if 'Score' in df else None,
-        "fail_rate": float((df['Score'] < 66).mean()) if 'Score' in df else None
-    }
-
-    return result
+    # Return the whole file as plain text
+    return {"filename": filename, "content": content}
