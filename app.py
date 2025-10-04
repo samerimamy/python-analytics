@@ -1,5 +1,6 @@
-from fastapi import FastAPI, Query
 import os
+import pandas as pd
+from fastapi import FastAPI
 
 app = FastAPI()
 
@@ -7,22 +8,18 @@ app = FastAPI()
 def root():
     return {"message": "Python Analytics Server is running"}
 
-@app.get("/show_file")
-def show_file(filename: str = Query(..., description="File name to display")):
-    if not os.path.exists(filename):
-        return {"error": f"File not found: {filename}"}
+@app.get("/mis")
+def mis_analytics():
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    csv_path = os.path.join(base_dir, "test.csv")
 
-    try:
-        with open(filename, "r", encoding="utf-8") as f:
-            content = f.read()
-    except Exception as e:
-        return {"error": str(e)}
+    df = pd.read_csv(csv_path)
 
-    # Only return the first 2000 characters to avoid overload
-    preview = content[:2000] + ("..." if len(content) > 2000 else "")
-
-    return {
-        "filename": filename,
-        "length": len(content),
-        "preview": preview
+    result = {
+        "Total": int(len(df)),
+        "BySemester": df["Semester"].value_counts().to_dict(),
+        "ByCourse": df["Course"].value_counts().to_dict(),
+        "EmploymentRate": float(df["EmployedWithin6Months"].mean()),
+        "AverageGPA": float(df["GPA"].mean())
     }
+    return result
