@@ -16,10 +16,10 @@ def mis_analytics():
     df = pd.read_csv(csv_path)
 
     result = {
-        "Total": int(len(df)),
-        "BySemester": df["Semester"].value_counts().to_dict(),
-        "ByCourse": df["Course"].value_counts().to_dict(),
-        "EmploymentRate": float(df["EmployedWithin6Months"].mean()),
-        "AverageGPA": float(df["GPA"].mean())
+         "Total": int(len(df))
+        # "BySemester": df["Semester"].value_counts().to_dict(),
+        # "ByCourse": df["Course"].value_counts().to_dict(),
+        # "EmploymentRate": float(df["EmployedWithin6Months"].mean()),
+        # "AverageGPA": float(df["GPA"].mean())
     }
     return result
