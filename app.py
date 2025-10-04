@@ -30,7 +30,5 @@ def analyze_csv_analytics():
 
     df = pd.read_csv(csv_path)
 
-    result = {
-        df.to_dict(orient="records")
-    }
-    return result
+    result = df.to_dict(orient="records")
+    return {"data": result}
