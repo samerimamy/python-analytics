@@ -8,6 +8,12 @@ app = FastAPI()
 def root():
     return {"message": "Python Analytics Server is running"}
 
+@app.get("/files")
+def list_files():
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    return {"current_dir": base_dir, "files": os.listdir(base_dir)}
+
+
 @app.get("/mis")
 def mis_analytics():
     base_dir = os.path.dirname(os.path.abspath(__file__))
