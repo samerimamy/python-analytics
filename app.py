@@ -19,7 +19,7 @@ def analyze_csv(filename: str = Query(...)):
         return {"error": f"File not found: {filepath}"}
 
     try:
-        df = pd.read_csv(filepath)
+        df = pd.read_csv("test.csv")
     except Exception as e:
         return {"error": f"Failed to read CSV: {str(e)}"}
 
