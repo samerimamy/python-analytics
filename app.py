@@ -32,3 +32,8 @@ def analyze_csv_analytics():
 
     result = df.to_dict(orient="records")
     return {"data": result}
+@app.get("/onedrive")
+def onedrive_analytics():
+    onedrive_url = "https://pmuedusa-my.sharepoint.com/_layouts/15/download.aspx?SourceUrl=/personal/salimamy_pmu_edu_sa/Documents/test.csv"
+    df = pd.read_csv(onedrive_url)
+    return {"data": df.to_dict(orient="records")}
