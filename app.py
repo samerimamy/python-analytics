@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 import os
 
 app = FastAPI()
@@ -8,7 +8,7 @@ def root():
     return {"message": "Python Analytics Server is running"}
 
 @app.get("/show_file")
-def show_file(filename: str = "test.py"):
+def show_file(filename: str = Query(..., description="File name to display")):
     if not os.path.exists(filename):
         return {"error": f"File not found: {filename}"}
 
@@ -18,5 +18,11 @@ def show_file(filename: str = "test.py"):
     except Exception as e:
         return {"error": str(e)}
 
-    # Return the whole file as plain text
-    return {"filename": filename, "content": content}
+    # Only return the first 2000 characters to avoid overload
+    preview = content[:2000] + ("..." if len(content) > 2000 else "")
+
+    return {
+        "filename": filename,
+        "length": len(content),
+        "preview": preview
+    }
